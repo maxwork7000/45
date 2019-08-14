@@ -1,0 +1,5 @@
+#,Safari,Page,Field,isPresent,Value,Size,Location
+01,Safari,index.php,First Name,true,Max,(386x42),(0x0)
+02,Safari,index.php,Last Name,true,Vaulin,(386x42),(0x0)
+03,Safari,index.php,Email,true,john_smith@gmail.com,(386x42),(0x0)
+04,Safari,index.php,Phone,true,415 555-1212,(386x42),(0x0)
