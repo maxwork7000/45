@@ -1,0 +1,5 @@
+#,Chrome,Page,Field,isPresent,Value,Size,Location
+01,Chrome,index.php,First Name,true,Max,(386x42),(234x181)
+02,Chrome,index.php,Last Name,true,Vaulin,(386x42),(659x181)
+03,Chrome,index.php,Email,true,john_smith@gmail.com,(386x42),(234x261)
+04,Chrome,index.php,Phone,true,415 555-1212,(386x42),(659x261)

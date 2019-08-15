@@ -1,0 +1,5 @@
+#,Firefox,Page,Field,isPresent,Value,Size,Location
+01,Firefox,index.php,First Name,true,Max,(343x38),(240x182)
+02,Firefox,index.php,Last Name,true,Vaulin,(343x38),(665x182)
+03,Firefox,index.php,Email,true,john_smith@gmail.com,(343x38),(240x262)
+04,Firefox,index.php,Phone,true,415 555-1212,(343x38),(665x262)
