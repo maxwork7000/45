@@ -21,246 +21,187 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.safari.SafariDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
- 
+
+
 public class Linear {
-              static String browser;
-              static WebDriver driver;
-              static Writer report;
-              static Properties p = new Properties();
-              static String url;
-      
-// Method to get Web-driver 
-              static void getWebDriver(String browser) {
-                     Logger.getLogger("").setLevel(Level.OFF);
- 
-                     String driverPath = "";
- 
-                     if (browser.equalsIgnoreCase("firefox")) {
-                           if (System.getProperty("os.name").toUpperCase().contains("MAC"))
-                                  driverPath = "./resources/webdrivers/mac/geckodriver.sh";
-                           else if (System.getProperty("os.name").toUpperCase().contains("WINDOWS"))
-                                  driverPath = "./resources/webdrivers/pc/geckodriver.exe";
- 
-                           else
-                                  throw new IllegalArgumentException("Unknown OS");
-                           System.setProperty("webdriver.gecko.driver", driverPath);
-                           driver = new FirefoxDriver();
-                           driver.manage().window().maximize();
-                           driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
-                     }
- 
-                     else if (browser.equalsIgnoreCase("chrome")) {
-                           if (System.getProperty("os.name").toUpperCase().contains("MAC"))
-                                  driverPath = "./resources/webdrivers/mac/chromedriver";
-                           else if (System.getProperty("os.name").toUpperCase().contains("WINDOWS"))
-                                  driverPath = "./resources/webdrivers/pc/chromedriver.exe";
-                           else
-                                  throw new IllegalArgumentException("Unknown OS");
-                           System.setProperty("webdriver.chrome.driver", driverPath);
-                           System.setProperty("webdriver.chrome.silentOutput", "true");
-                           ChromeOptions option = new ChromeOptions();
-                           option.addArguments("disable-infobars");
-                           option.addArguments("--disable-notifications");
-                           if (System.getProperty("os.name").toUpperCase().contains("MAC"))
-                                  option.addArguments("-start-fullscreen");
-                           else if (System.getProperty("os.name").toUpperCase().contains("WINDOWS"))
-                                  option.addArguments("--start-maximized");
-                           else
-                                  throw new IllegalArgumentException("Unknown OS");
-                           driver = new ChromeDriver(option);
-                           driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
-                     }
- 
-                     else if (browser.equalsIgnoreCase("safari")) {
-                           if (!System.getProperty("os.name").contains("Mac")) {
-                                  throw new IllegalArgumentException("Safari is available only on Mac");
-                           }
-                           driver = new SafariDriver();
-                           driver.manage().window().maximize();
-                           driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
-                     }
- 
-                     else if (browser.equalsIgnoreCase("edge")) {
-                           if (!System.getProperty("os.name").contains("Windows"))
-                                  throw new IllegalArgumentException("MS Edge is available only on Windows");
-                           System.setProperty("webdriver.edge.driver", "./resources/webdrivers/pc/MicrosoftWebDriver.exe");
-                           driver = new EdgeDriver();
-                           driver.manage().window().maximize();
-                           driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
-                     }
- 
-                     else {
-                           throw new WebDriverException("Unknown WebDriver");
-                     }
- 
-              }
-             
-// Method to open browser
-              static void open(String browser) throws FileNotFoundException, IOException {
-                     getWebDriver(browser);
-                     p.load(new FileInputStream("./input.properties"));
-                     url=p.getProperty("url");
-                     driver.get(url);
-              }
- 
-              static boolean isElementPresent(By by) {
-                     driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-                     if (!driver.findElements(by).isEmpty())
-                           return true;
-                     else
-                           return false;
-              }
- 
-              static String getSize(By by) {
-                     driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-                     if (!driver.findElements(by).isEmpty() && driver.findElement(by).isDisplayed())
-                           // return driver.findElement(by).getRect().getDimension()
-                           return driver.findElement(by).getSize().toString().replace(", ", "x");
-                     else
-                           return "null";
-              }
- 
-              static String getLocation(By by) {
-                     driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-                     if (((RemoteWebDriver) driver).getCapabilities().getBrowserName().equals("Safari"))
-                           return "(0x0)";
-                     else {
-                           if (!driver.findElements(by).isEmpty() && driver.findElement(by).isDisplayed())
-                                  return driver.findElement(by).getRect().getPoint().toString().replace(", ", "x");
-                           else
-                                  return "null";
-                     }
-              }
- 
-              static void setValue(By by, String value) {
-                     driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-                     if (!driver.findElements(by).isEmpty() && driver.findElement(by).isDisplayed())
-                           driver.findElement(by).sendKeys(value);
-              }
- 
-              static String getValue(By by) {
-                     driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-                     if (!driver.findElements(by).isEmpty() && driver.findElement(by).isDisplayed()
-                                  && driver.findElement(by).getTagName().equalsIgnoreCase("input"))
-                           return driver.findElement(by).getAttribute("value").toString().trim();
-                     else if (!driver.findElements(by).isEmpty() && driver.findElement(by).isDisplayed()
-                                  && driver.findElement(by).getTagName().equalsIgnoreCase("span"))
-                           return driver.findElement(by).getText().trim();
-                     else
-                           return "null";
-              }
- 
-              static void submit(By by) {
-                     driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-                     if (!driver.findElements(by).isEmpty() && driver.findElement(by).isDisplayed())
-                           driver.findElement(by).submit();
-              }
- 
-              static String getOS() {
-                     return ((RemoteWebDriver) driver).getCapabilities().getPlatform().toString().trim();
-              }
- 
-              static String getBrowser() {
-                     String browser = ((RemoteWebDriver) driver).getCapabilities().getBrowserName().toString().trim();
-                     return browser.replaceFirst(String.valueOf(browser.charAt(0)), String.valueOf(browser.charAt(0)).toUpperCase());
-                     // return browser.substring(0,1).toUpperCase() +
-                     // browser.substring(1).toLowerCase();
-              }
- 
-              static String getFileName() {
-                     String file = driver.getCurrentUrl().toString().trim();
-                     return file.substring(file.lastIndexOf('/') + 1);
-              }
- 
-              static void waitTitlePage(String title) {
-                     WebDriverWait wait = new WebDriverWait(driver, 15);
-                     wait.until(ExpectedConditions.titleIs(title));
-              }
- 
-              static void writeReportHeader(Writer report) throws IOException {
-                     report.write("#," + getBrowser() + ",Page,Field,isPresent,Value,Size,Location" + "\n");
-                     System.out.print("#," + getBrowser() + ",Page,Field,isPresent,Value,Size,Location" + "\n");
-              }
- 
-              static void writeReportLine(String index, String fieldName, By by, Writer report) throws IOException {
-                     report.write(index + "," + getBrowser() + "," + getFileName() + "," + fieldName + ","
-                                  + isElementPresent(by) + "," + getValue(by) + "," + getSize(by) + ","
-                                  + getLocation(by) + "\n");
- 
-                     System.out.print(
-                                  index + "," +
-                                  getBrowser() + "," +
-                                  getFileName() + "," +
-                                  fieldName + "," +
-                                  isElementPresent(by) + "," +
-                                  getValue(by) + "," +
-                                  getSize(by) + "," +
-                                  getLocation(by) + "\n");
-              }
-             
-// Close browser
-              static void quit() {
-                     driver.quit();
-              }
-             
-// SignUp validation       
-              static void validateSignUp() throws IOException {
-                     p.load(new FileInputStream("./input.properties"));
-                     url = p.getProperty("url");
-                     report = new FileWriter("./report_function_" + getBrowser().toString().toLowerCase() + ".csv", false);
-                     writeReportHeader(report);
-                     // 01 :: First Name
-                     setValue(By.id(p.getProperty("fname_id")), p.getProperty("fname_value"));
-                     writeReportLine("01", "First Name", By.id(p.getProperty("fname_id")), report);
-                     // 02 :: Last Name
-                     setValue(By.id(p.getProperty("lname_id")), p.getProperty("lname_value"));
-                     writeReportLine("02", "Last Name", By.id(p.getProperty("lname_id")), report);
-                     // 03 :: Email
-                     setValue(By.id(p.getProperty("email_id")), p.getProperty("email_value"));
-                     writeReportLine("03", "Email", By.id(p.getProperty("email_id")), report);
-                     // 04 :: Phone
-                     setValue(By.id(p.getProperty("phone_id")), p.getProperty("phone_value"));
-                     writeReportLine("04", "Phone", By.id(p.getProperty("phone_id")), report);
-                     // SUBMIT
-                     submit(By.id(p.getProperty("submit_id")));
-                     waitTitlePage("Confirmation");
-                     report.flush();
-                     report.close();
-              }
-             
-// Confirmation validation
-              static void validateConfirmation() throws IOException {
-                     p.load(new FileInputStream("./input.properties"));
-                     report = new FileWriter("./report_" + getBrowser().toString().toLowerCase() + ".csv", true);
-                     // 05 :: First Name
-                     writeReportLine("05", "First Name", By.id(p.getProperty("fname_id")), report);
-                     // 06 :: Last Name
-                     writeReportLine("06", "Last Name", By.id(p.getProperty("lname_id")), report);
-                     // 07 :: Email
-                     writeReportLine("07", "Email", By.id(p.getProperty("email_id")), report);
-                     // 08 :: Phone
-                     writeReportLine("08", "Phone", By.id(p.getProperty("phone_id")), report);
-                     report.flush();
-                     report.close();
-              }
-             
-// Main method
-              public static void main(String[] args) throws Exception {
-                     //browser = "firefox";
-                     browser = System.getProperty("browser"); // -Dbrowser="firefox"
-                     if (browser == null) {
-                           System.err.println("Please provide browser: -Dbrowser=firefox");
-                           System.exit(0);
-                     } else if (!browser.equalsIgnoreCase("chrome") && !browser.equalsIgnoreCase("firefox")
-                                  && !browser.equalsIgnoreCase("safari") && !browser.equalsIgnoreCase("edge")) {
-                           System.err.println("Framework supports only: Chrome, Firefox, Safari or Edge");
-                           System.exit(0);
-                     }
- 
-                     open(browser);
-                     validateSignUp();
-                     validateConfirmation();
-                     quit();
-              }
-       }
- 
+	static Properties p = new Properties();
+    static Writer report;
+    static String ls = System.getProperty("line.separator");
+	static WebDriver driver;
+	
+	public static boolean isElementPresent(By by) {
+	     driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+	     if (!driver.findElements(by).isEmpty()) return true; else return false;}
+	
+	public static String getSize(By by) {
+	     driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+	     if (!driver.findElements(by).isEmpty() && driver.findElement(by).isDisplayed())
+	    	 return driver.findElement(by).getRect().getDimension().toString().replace(", ", "x"); else return "null";}
+
+	public static String getLocation(By by) {
+	     driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+	     if (!driver.findElements(by).isEmpty() && driver.findElement(by).isDisplayed())
+	    	 return driver.findElement(by).getRect().getPoint().toString().replace(", ", "x"); else return "null";}
+	
+	public static void setValue(By by, String value) {
+	     driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+	     if (!driver.findElements(by).isEmpty() && driver.findElement(by).isDisplayed())
+	     	  driver.findElement(by).sendKeys(p.getProperty(value));}
+	
+	public static String getValue(By by) {
+	     driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+	     if (!driver.findElements(by).isEmpty() && driver.findElement(by).isDisplayed())
+	    	 return driver.findElement(by).getText(); else return "null";}
+	
+	public static void main(String[] args) throws Exception {
+		Logger.getLogger("").setLevel(Level.OFF);
+		p.load(new FileInputStream("./input.properties"));
+		report = new FileWriter("./report_chrome.csv",false);
+		String driverPath = "";
+		if (System.getProperty("os.name").toUpperCase().contains("MAC"))
+			driverPath = "./resources/webdrivers/mac/geckodriver.sh";
+		else if (System.getProperty("os.name").toUpperCase().contains("WINDOWS"))
+			driverPath = "./resources/webdrivers/pc/geckodriver.exe";
+		else throw new IllegalArgumentException("Unknown OS");
+		System.setProperty("webdriver.gecko.driver", driverPath);
+		driver = new FirefoxDriver();
+		driver.manage().window().maximize();
+		driver.get(p.getProperty("url"));
+		
+// HEADER
+		
+		System.out.println("#,Browser,Page,Field,isPresent,Value,Size,Location");
+		report.write("#,Browser,Page,Field,isPresent,Value, Size, Location"); report.write(ls);
+		
+// 01 :: First Name		
+		
+		report.write("01,Firefox,index.php,First Name," + 
+				isElementPresent(By.id(p.getProperty("fname_id"))) + "," +
+				p.getProperty("fname_value") + "," +
+				getSize(By.id(p.getProperty("fname_id"))) + "," +
+				getLocation(By.id(p.getProperty("fname_id"))) + "\n");
+		
+		System.out.print("01,Firefox,index.php,First Name," + 
+				isElementPresent(By.id(p.getProperty("fname_id"))) + "," +
+				p.getProperty("fname_value") + "," +
+				getSize(By.id(p.getProperty("fname_id"))) + "," +
+				getLocation(By.id(p.getProperty("fname_id"))) + "\n");
+
+		setValue(By.id(p.getProperty("fname_id")),"fname_value");
+		
+// 02 :: Last Name
+		
+		report.write("02,Firefox,index.php,Last Name," + 
+				isElementPresent(By.id(p.getProperty("lname_id"))) + "," +
+				p.getProperty("lname_value") + "," +
+				getSize(By.id(p.getProperty("lname_id"))) + "," +
+				getLocation(By.id(p.getProperty("lname_id"))) + "\n");
+		
+		System.out.print("02,Firefox,index.php,Last Name," + 
+				isElementPresent(By.id(p.getProperty("lname_id"))) + "," +
+				p.getProperty("lname_value") + "," +
+				getSize(By.id(p.getProperty("lname_id"))) + "," +
+				getLocation(By.id(p.getProperty("lname_id"))) + "\n");
+		
+		setValue(By.id(p.getProperty("lname_id")),"lname_value");
+		
+// 03 :: Email	
+		
+		report.write("03,Firefox,index.php,Email," + 
+				isElementPresent(By.id(p.getProperty("email_id"))) + "," +
+				p.getProperty("email_value") + "," +
+				getSize(By.id(p.getProperty("email_id"))) + "," +
+				getLocation(By.id(p.getProperty("email_id"))) + "\n");
+		
+		System.out.print("03,Firefox,index.php,Email," + 
+				isElementPresent(By.id(p.getProperty("email_id"))) + "," +
+				p.getProperty("email_value") + "," +
+				getSize(By.id(p.getProperty("email_id"))) + "," +
+				getLocation(By.id(p.getProperty("email_id"))) + "\n");
+		setValue(By.id(p.getProperty("email_id")),"email_value");
+		
+// 04 :: Phone
+		
+		report.write("04,Firefox,index.php,Phone," + 
+				isElementPresent(By.id(p.getProperty("phone_id"))) + "," +
+				p.getProperty("phone_value") + "," +
+				getSize(By.id(p.getProperty("phone_id"))) + "," +
+				getLocation(By.id(p.getProperty("phone_id"))) + "\n");
+		
+		System.out.print("04,Firefox,index.php,Phone," + 
+				isElementPresent(By.id(p.getProperty("phone_id"))) + "," +
+				p.getProperty("phone_value") + "," +
+				getSize(By.id(p.getProperty("phone_id"))) + "," +
+				getLocation(By.id(p.getProperty("phone_id"))) + "\n");
+		
+		setValue(By.id(p.getProperty("phone_id")),"phone_value");
+		
+// SUBMIT	
+		
+		driver.findElement(By.id(p.getProperty("submit_id"))).submit(); 
+		WebDriverWait wait = new WebDriverWait(driver, 15); 
+		wait.until(ExpectedConditions.titleIs("Confirmation"));
+		
+// 05 :: First Name
+		
+		report.write("05,Firefox,confirmation.php,First Name," + 
+				isElementPresent(By.id(p.getProperty("fname_id"))) + "," +
+				p.getProperty("fname_value") + "," +
+				getSize(By.id(p.getProperty("fname_id"))) + "," +
+				getLocation(By.id(p.getProperty("fname_id"))) + "\n");
+		
+		System.out.print("05,Firefox,confirmation.php,First Name," + 
+				isElementPresent(By.id(p.getProperty("fname_id"))) + "," +
+				p.getProperty("fname_value") + "," +
+				getSize(By.id(p.getProperty("fname_id"))) + "," +
+				getLocation(By.id(p.getProperty("fname_id"))) + "\n");
+		
+// 06 :: Last Name
+		
+		report.write("06,Firefox,confirmation.php,Last Name," + 
+				isElementPresent(By.id(p.getProperty("lname_id"))) + "," +
+				p.getProperty("lname_value") + "," +
+				getSize(By.id(p.getProperty("lname_id"))) + "," +
+				getLocation(By.id(p.getProperty("lname_id"))) + "\n");
+		
+		System.out.print("06,Firefox,confirmation.php,Last Name," + 
+				isElementPresent(By.id(p.getProperty("lname_id"))) + "," +
+				p.getProperty("lname_value") + "," +
+				getSize(By.id(p.getProperty("lname_id"))) + "," +
+				getLocation(By.id(p.getProperty("lname_id"))) + "\n");
+		
+// 07 :: Email
+		
+		report.write("07,Firefox,confirmation.php,Email," + 
+				isElementPresent(By.id(p.getProperty("email_id"))) + "," +
+				p.getProperty("email_value") + "," +
+				getSize(By.id(p.getProperty("email_id"))) + "," +
+				getLocation(By.id(p.getProperty("email_id"))) + "\n");
+		
+		System.out.print("07,Firefox,confirmation.php,Email," + 
+				isElementPresent(By.id(p.getProperty("email_id"))) + "," +
+				p.getProperty("email_value") + "," +
+				getSize(By.id(p.getProperty("email_id"))) + "," +
+				getLocation(By.id(p.getProperty("email_id"))) + "\n");		
+
+// 08 :: Phone
+		
+		report.write("08,Firefox,confirmation.php,Phone," + 
+				isElementPresent(By.id(p.getProperty("phone_id"))) + "," +
+				p.getProperty("phone_value") + "," +
+				getSize(By.id(p.getProperty("phone_id"))) + "," +
+				getLocation(By.id(p.getProperty("phone_id"))) + "\n");
+		
+		System.out.print("08,Firefox,confirmation.php,Phone," + 
+				isElementPresent(By.id(p.getProperty("phone_id"))) + "," +
+				p.getProperty("phone_value") + "," +
+				getSize(By.id(p.getProperty("phone_id"))) + "," +
+				getLocation(By.id(p.getProperty("phone_id"))) + "\n");
+//	
+		
+		
+		report.flush();
+		report.close();
+		driver.quit();
+	}
+}
