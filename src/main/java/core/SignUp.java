@@ -17,7 +17,7 @@ class SignUp {
 		Common.open(browser, p.getProperty("url"));
 	}
 
-	static void validate() throws IOException {
+	static void validate() throws Exception {
 		p.load(new FileInputStream("./input.properties"));
 		report = new FileWriter("./report_" + Common.getBrowser().toString().toLowerCase() +".csv", false);
 		Common.writeReportHeader(report);

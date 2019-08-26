@@ -12,7 +12,7 @@ class Confirmation {
 	static Properties p = new Properties();
 	static Writer report;
 
-	static void validate() throws IOException {
+	static void validate() throws Exception {
 		p.load(new FileInputStream("./input.properties"));
 		report = new FileWriter("./report_" + Common.getBrowser().toString().toLowerCase() +".csv", true);
 		// 05 :: First Name

@@ -75,38 +75,45 @@ class Common {
 		else {throw new WebDriverException("Unknown WebDriver");}
 		}
 	
-
 	static void open(String browser, String url){
 		getWebDriver(browser);
 		driver.get(url);
 		}
 	
-	static boolean isElementPresent(By by) {
-
+	static boolean isElementPresent(By by) throws Exception {
 		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-		if (!driver.findElements(by).isEmpty()) return true; else return false;}
+		if (!driver.findElements(by).isEmpty()) {
+			highlightElement(driver.findElement(by));
+			unhighlightElement(driver.findElement(by));
+			return true;}
+		else return false;}
 	
 	static String getSize(By by) {
-
 		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		if (!driver.findElements(by).isEmpty() && driver.findElement(by).isDisplayed())
-			// return driver.findElement(by).getRect().getDimension()
 			return driver.findElement(by).getSize().toString().replace(", ", "x"); else return "null";}
 
 	static String getLocation(By by) {
 		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-		
 		if (((RemoteWebDriver) driver).getCapabilities().getBrowserName().equals("Safari")) return "(0x0)";
 		else {
 		if (!driver.findElements(by).isEmpty() && driver.findElement(by).isDisplayed())
-		return driver.findElement(by).getRect().getPoint().toString().replace(", ", "x"); 
+		return driver.findElement(by).getLocation().toString().replace(", ", "x"); 
 		else return "null";}
 		}
+	
+    public static void highlightElement(WebElement element) throws Exception{
+    	((RemoteWebDriver) driver).executeScript("arguments[0].setAttribute('style','border: solid 3px red');", element);
+        Thread.sleep(100);}
+    public static void unhighlightElement(WebElement element) throws Exception{
+    	Thread.sleep(100);
+        ((RemoteWebDriver) driver).executeScript("arguments[0].setAttribute('style','border: solid 0px red');", element);}
 
 	static void setValue(By by, String value) {
 		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		if (!driver.findElements(by).isEmpty() && driver.findElement(by).isDisplayed())
-			 driver.findElement(by).sendKeys(value);}
+			driver.findElement(by).sendKeys(value);
+	}
 	
 	static String getValue(By by) {
 		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
@@ -123,15 +130,10 @@ class Common {
 		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		if (!driver.findElements(by).isEmpty() && driver.findElement(by).isDisplayed())
 			driver.findElement(by).submit();}
-
-	static String getOS() {
-		return ((RemoteWebDriver) driver).getCapabilities().getPlatform().toString().trim();
-			}
 	
 	static String getBrowser() {
 		String browser = ((RemoteWebDriver) driver).getCapabilities().getBrowserName().toString().trim();
 		return browser.replaceFirst(String.valueOf(browser.charAt(0)), String.valueOf(browser.charAt(0)).toUpperCase());
-		// return browser.substring(0,1).toUpperCase() + browser.substring(1).toLowerCase();
 			}
 	
 	static String getFileName() {
@@ -149,7 +151,7 @@ class Common {
 		System.out.print("#,Browser,Page,Field,isPresent,Value,Size,Location" + "\n");
 		}
 
-	static void writeReportLine(String index, String fieldName, By by, Writer report) throws IOException {
+	static void writeReportLine(String index, String fieldName, By by, Writer report) throws Exception {
 		
 		report.write(
 				index + "," + 
@@ -172,7 +174,26 @@ class Common {
 				Common.getLocation(by) + "\n");
 		}
 	
-	static void quit(){
-		driver.quit();
-		}
+	static void quit(){driver.quit();}
+	
+	public static void checkCheckBox(By by) {
+	     driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+	     if (!driver.findElements(by).isEmpty() && 
+	    	  driver.findElement(by).isDisplayed() && 
+	    	 !driver.findElement(by).isSelected())
+	    	 driver.findElement(by).click();}
+
+	public static void checkRadioButton(By by) {
+	     if (!driver.findElements(by).isEmpty() && 
+		      driver.findElement(by).isDisplayed() && 
+		     !driver.findElement(by).isSelected())
+		     driver.findElement(by).click();}
+	
+	public static void selectDropDown(By by, String value) {
+	     driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+	     if (!driver.findElements(by).isEmpty() && driver.findElement(by).isDisplayed())
+	    	 // new Select(driver.findElement(by)).selectByIndex(5);
+	    	 // new Select(driver.findElement(by)).selectByValue(value);  // <option value="CA">
+	    	 new Select(driver.findElement(by)).selectByVisibleText(value);
+	     	}
 }
